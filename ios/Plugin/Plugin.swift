@@ -31,6 +31,22 @@ public class SpeechRecognition: CAPPlugin {
         ])
     }
 
+    @objc func supportsOnDeviceRecognition(_ call: CAPPluginCall) {
+        guard let recognizer = SFSpeechRecognizer() else {
+            call.resolve([
+                "supportsOnDevice": false
+            ])
+            return
+        }
+        
+        // Check if on-device recognition is supported
+        // This is available on iOS 13+ and depends on the device capabilities
+        let supportsOnDevice = recognizer.supportsOnDeviceRecognition
+        call.resolve([
+            "supportsOnDevice": supportsOnDevice
+        ])
+    }
+
     @objc func start(_ call: CAPPluginCall) {
         if self.audioEngine != nil {
             if self.audioEngine!.isRunning {

@@ -4,6 +4,9 @@ export declare class SpeechRecognitionWeb extends WebPlugin implements SpeechRec
     available(): Promise<{
         available: boolean;
     }>;
+    supportsOnDeviceRecognition(): Promise<{
+        supportsOnDevice: boolean;
+    }>;
     start(_options?: UtteranceOptions): Promise<{
         matches?: string[];
     }>;

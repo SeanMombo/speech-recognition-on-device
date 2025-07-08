@@ -6,6 +6,9 @@ export class SpeechRecognitionWeb extends WebPlugin implements SpeechRecognition
   available(): Promise<{ available: boolean }> {
     throw this.unimplemented('Method not implemented on web.');
   }
+  supportsOnDeviceRecognition(): Promise<{ supportsOnDevice: boolean }> {
+    throw this.unimplemented('Method not implemented on web.');
+  }
   start(_options?: UtteranceOptions): Promise<{ matches?: string[] }> {
     throw this.unimplemented('Method not implemented on web.');
   }

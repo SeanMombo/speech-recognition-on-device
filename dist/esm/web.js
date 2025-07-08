@@ -3,6 +3,9 @@ export class SpeechRecognitionWeb extends WebPlugin {
     available() {
         throw this.unimplemented('Method not implemented on web.');
     }
+    supportsOnDeviceRecognition() {
+        throw this.unimplemented('Method not implemented on web.');
+    }
     start(_options) {
         throw this.unimplemented('Method not implemented on web.');
     }

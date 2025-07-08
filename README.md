@@ -47,6 +47,7 @@ No further action required.
 <docgen-index>
 
 * [`available()`](#available)
+* [`supportsOnDeviceRecognition()`](#supportsondevicerecognition)
 * [`start(...)`](#start)
 * [`stop()`](#stop)
 * [`getSupportedLanguages()`](#getsupportedlanguages)
@@ -67,6 +68,9 @@ No further action required.
 import { SpeechRecognition } from "@capacitor-community/speech-recognition";
 
 SpeechRecognition.available();
+
+// Check if device supports on-device transcription
+SpeechRecognition.supportsOnDeviceRecognition();
 
 SpeechRecognition.start({
   language: "en-US",
@@ -108,6 +112,19 @@ available() => Promise<{ available: boolean; }>
 This method will check if speech recognition feature is available on the device.
 
 **Returns:** <code>Promise&lt;{ available: boolean; }&gt;</code>
+
+--------------------
+
+
+### supportsOnDeviceRecognition()
+
+```typescript
+supportsOnDeviceRecognition() => Promise<{ supportsOnDevice: boolean; }>
+```
+
+This method will check if the device supports on-device speech recognition.
+
+**Returns:** <code>Promise&lt;{ supportsOnDevice: boolean; }&gt;</code>
 
 --------------------
 

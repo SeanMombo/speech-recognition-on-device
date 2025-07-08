@@ -21,6 +21,14 @@ export interface SpeechRecognitionPlugin {
         available: boolean;
     }>;
     /**
+     * This method will check if the device supports on-device speech recognition.
+     * @param none
+     * @returns supportsOnDevice - boolean true/false for on-device support
+     */
+    supportsOnDeviceRecognition(): Promise<{
+        supportsOnDevice: boolean;
+    }>;
+    /**
      * This method will start to listen for utterance.
      *
      * if `partialResults` is `true`, the function respond directly without result and

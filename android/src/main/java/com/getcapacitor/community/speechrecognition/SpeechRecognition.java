@@ -65,6 +65,15 @@ public class SpeechRecognition extends Plugin implements Constants {
     }
 
     @PluginMethod
+    public void supportsOnDeviceRecognition(PluginCall call) {
+        Logger.info(getLogTag(), "Called for supportsOnDeviceRecognition()");
+        boolean supportsOnDevice = isOnDeviceRecognitionSupported();
+        JSObject result = new JSObject();
+        result.put("supportsOnDevice", supportsOnDevice);
+        call.resolve(result);
+    }
+
+    @PluginMethod
     public void start(PluginCall call) {
         if (!isSpeechRecognitionAvailable()) {
             call.unavailable(NOT_AVAILABLE);
@@ -145,6 +154,18 @@ public class SpeechRecognition extends Plugin implements Constants {
 
     private boolean isSpeechRecognitionAvailable() {
         return SpeechRecognizer.isRecognitionAvailable(bridge.getContext());
+    }
+
+    private boolean isOnDeviceRecognitionSupported() {
+        // Check if the device supports on-device speech recognition
+        // This is available on Android 13+ (API level 33+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return true;
+        }
+        
+        // For older versions, we can't reliably determine on-device support
+        // as it depends on the specific device and Google Play Services
+        return false;
     }
 
     private void listening(boolean value) {

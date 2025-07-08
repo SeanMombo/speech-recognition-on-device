@@ -25,6 +25,25 @@
         "slug": "available"
       },
       {
+        "name": "supportsOnDeviceRecognition",
+        "signature": "() => Promise<{ supportsOnDevice: boolean; }>",
+        "parameters": [],
+        "returns": "Promise<{ supportsOnDevice: boolean; }>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "none"
+          },
+          {
+            "name": "returns",
+            "text": "supportsOnDevice - boolean true/false for on-device support"
+          }
+        ],
+        "docs": "This method will check if the device supports on-device speech recognition.",
+        "complexTypes": [],
+        "slug": "supportsondevicerecognition"
+      },
+      {
         "name": "start",
         "signature": "(options?: UtteranceOptions | undefined) => Promise<{ matches?: string[]; }>",
         "parameters": [
