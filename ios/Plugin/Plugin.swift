@@ -54,7 +54,8 @@ public class SpeechRecognition: CAPPlugin {
             let language: String = call.getString("language") ?? "en-US"
             let maxResults: Int = call.getInt("maxResults") ?? self.defaultMatches
             let partialResults: Bool = call.getBool("partialResults") ?? false
-
+            let requiresOnDeviceRecognition: Bool = call.getBool("requiresOnDeviceRecognition") ?? false
+                                                                 
             if self.recognitionTask != nil {
                 self.recognitionTask?.cancel()
                 self.recognitionTask = nil
@@ -79,7 +80,9 @@ public class SpeechRecognition: CAPPlugin {
 
             self.recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
             self.recognitionRequest?.shouldReportPartialResults = partialResults
-
+            if requiresOnDeviceRecognition {
+                self.recognitionRequest?.requiresOnDeviceRecognition = true
+            }
             let inputNode: AVAudioInputNode = self.audioEngine!.inputNode
             let format: AVAudioFormat = inputNode.outputFormat(forBus: 0)
 
