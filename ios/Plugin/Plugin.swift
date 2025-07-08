@@ -102,12 +102,25 @@ public class SpeechRecognition: CAPPlugin {
             let inputNode: AVAudioInputNode = self.audioEngine!.inputNode
             let format: AVAudioFormat = inputNode.outputFormat(forBus: 0)
 
-            self.recognitionTask = self.speechRecognizer?.recognitionTask(with: self.recognitionRequest!, resultHandler: { (result, error) in
-                if result != nil {
+            var recognitionHandler: ((SFSpeechRecognitionResult?, Error?) -> Void)!
+            recognitionHandler = { [weak self] (result, error) in
+                guard let self = self else { return }
+
+                if let anError = error {
+                    self.audioEngine?.stop()
+                    self.audioEngine?.inputNode.removeTap(onBus: 0)
+                    self.recognitionRequest = nil
+                    self.recognitionTask = nil
+                    self.notifyListeners("listeningState", data: ["status": "stopped"])
+                    call.reject(anError.localizedDescription)
+                    return
+                }
+
+                if let result = result {
                     let resultArray: NSMutableArray = NSMutableArray()
                     var counter: Int = 0
 
-                    for transcription: SFTranscription in result!.transcriptions {
+                    for transcription: SFTranscription in result.transcriptions {
                         if maxResults > 0 && counter < maxResults {
                             resultArray.add(transcription.formattedString)
                         }
@@ -115,31 +128,36 @@ public class SpeechRecognition: CAPPlugin {
                     }
 
                     if partialResults {
-                        self.notifyListeners("partialResults", data: ["matches": resultArray])
+                        self.notifyListeners("partialResults", data: ["matches": resultArray, "isFinal": result.isFinal])
                     } else {
                         call.resolve([
                             "matches": resultArray
                         ])
                     }
 
-                    if result!.isFinal {
-                        self.audioEngine!.stop()
-                        self.audioEngine?.inputNode.removeTap(onBus: 0)
-                        self.notifyListeners("listeningState", data: ["status": "stopped"])
-                        self.recognitionTask = nil
-                        self.recognitionRequest = nil
+                    if result.isFinal {
+                        if partialResults {
+                            self.recognitionTask?.cancel()
+                            self.recognitionTask = nil
+                            let newRequest = SFSpeechAudioBufferRecognitionRequest()
+                            newRequest.shouldReportPartialResults = partialResults
+                            if requiresOnDeviceRecognition {
+                                newRequest.requiresOnDeviceRecognition = true
+                            }
+                            self.recognitionRequest = newRequest
+                            self.recognitionTask = self.speechRecognizer?.recognitionTask(with: newRequest, resultHandler: recognitionHandler)
+                        } else {
+                            self.audioEngine!.stop()
+                            self.audioEngine?.inputNode.removeTap(onBus: 0)
+                            self.notifyListeners("listeningState", data: ["status": "stopped"])
+                            self.recognitionTask = nil
+                            self.recognitionRequest = nil
+                        }
                     }
                 }
+            }
 
-                if error != nil {
-                    self.audioEngine!.stop()
-                    self.audioEngine?.inputNode.removeTap(onBus: 0)
-                    self.recognitionRequest = nil
-                    self.recognitionTask = nil
-                    self.notifyListeners("listeningState", data: ["status": "stopped"])
-                    call.reject(error!.localizedDescription)
-                }
-            })
+            self.recognitionTask = self.speechRecognizer?.recognitionTask(with: self.recognitionRequest!, resultHandler: recognitionHandler)
 
             inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { (buffer: AVAudioPCMBuffer, _: AVAudioTime) in
                 self.recognitionRequest?.append(buffer)
